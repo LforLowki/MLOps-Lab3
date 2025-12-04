@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>MLOps Lab1</title>
+  </head>
+  <body>
+    <h1>MLOps Lab1 API</h1>
+    <form action="/predict" enctype="multipart/form-data" method="post">
+      <div>
+        <label>Image file</label>
+        <input name="file" type="file" accept="image/*" />
+      </div>
+      <div>
+        <label>Width (optional)</label>
+        <input name="width" type="number" />
+      </div>
+      <div>
+        <label>Height (optional)</label>
+        <input name="height" type="number" />
+      </div>
+      <div>
+        <button type="submit">Upload & Predict</button>
+      </div>
+    </form>
+    <hr />
+    <p>Use <a href="/docs">/docs</a> to test the API as well.</p>
+  </body>
+</html>

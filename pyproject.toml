@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lab1"
+version = "0.1.0"
+description = "Continuous Integration using GitHub Actions - Lab 1"
+authors = [{ name = "Your Name" }]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "click",
+    "pytest",
+    "pytest-cov",
+    "pylint",
+    "black",
+    "fastapi>=0.121.2",
+    "pillow>=12.0.0",
+    "uvicorn>=0.38.0",
+    "jinja2>=3.1.6",
+    "httpx>=0.28.1",
+    "python-multipart",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+
+[tool.pylint]
+disable = ["C0114", "C0115", "C0116"]
+
+[tool.pytest.ini_options]
+addopts = "-v --cov=lab1"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+
+[tool.setuptools]
+package-dir = { "" = "lab1" }
+
+[tool.setuptools.packages.find]
+where = ["lab1"]
