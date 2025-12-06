@@ -1,103 +1,120 @@
 """
-Simple preprocessing helpers required for the CLI tests.
-These are intentionally minimal — only what the tests expect.
+Preprocessing helpers compatible with CLI tests.
+Handles both Python lists and pandas DataFrames where appropriate.
 """
 
 import pandas as pd
 import numpy as np
 import re
-import random
 
 
-# ----------------------
-# DataFrame Helpers
-# ----------------------
-def remove_missing(df: pd.DataFrame) -> pd.DataFrame:
-    return df.dropna()
-
-
-def fill_missing(df: pd.DataFrame, value=0) -> pd.DataFrame:
-    return df.fillna(value)
-
-
-def remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:
-    return df.drop_duplicates()
-
-
-def normalize(df: pd.DataFrame, column=None, new_min=0.0, new_max=1.0) -> pd.DataFrame:
-    if column:
-        min_val = df[column].min()
-        max_val = df[column].max()
-        df[column] = (df[column] - min_val) / (max_val - min_val) * (new_max - new_min) + new_min
+# -----------------------------
+# CLEANING FUNCTIONS
+# -----------------------------
+def remove_missing(data):
+    """Remove missing values (None or empty strings) from list or DataFrame column."""
+    if isinstance(data, list):
+        return [x for x in data if x not in (None, "")]
+    elif isinstance(data, pd.DataFrame):
+        return data.dropna()
     else:
-        df = (df - df.min()) / (df.max() - df.min()) * (new_max - new_min) + new_min
-    return df
+        raise TypeError("Unsupported type for remove_missing")
 
 
-def standardize(df: pd.DataFrame, column=None) -> pd.DataFrame:
-    if column:
-        mean = df[column].mean()
-        std = df[column].std() or 1.0
-        df[column] = (df[column] - mean) / std
+def fill_missing(data, value=0):
+    """Fill missing values in list or DataFrame column."""
+    if isinstance(data, list):
+        return [x if x not in (None, "") else value for x in data]
+    elif isinstance(data, pd.DataFrame):
+        return data.fillna(value)
     else:
-        df = (df - df.mean()) / df.std().replace(0, 1.0)
-    return df
+        raise TypeError("Unsupported type for fill_missing")
 
 
-def clip(df: pd.DataFrame, column=None, min_value=0.0, max_value=1.0) -> pd.DataFrame:
-    if column:
-        df[column] = df[column].clip(min_value, max_value)
+def remove_duplicates(data):
+    """Remove duplicate values from list or DataFrame."""
+    if isinstance(data, list):
+        return list(dict.fromkeys(data))
+    elif isinstance(data, pd.DataFrame):
+        return data.drop_duplicates()
     else:
-        df = df.clip(min_value, max_value)
-    return df
+        raise TypeError("Unsupported type for remove_duplicates")
 
 
-def convert_to_int(df: pd.DataFrame, column=None) -> pd.DataFrame:
-    if column:
-        df[column] = df[column].astype(int)
-    else:
-        df = df.astype(int)
-    return df
+# -----------------------------
+# NUMERIC FUNCTIONS
+# -----------------------------
+def normalize(data, new_min=0.0, new_max=1.0):
+    """Normalize numeric list or DataFrame column to [new_min, new_max]."""
+    arr = np.array(data, dtype=float)
+    min_val, max_val = arr.min(), arr.max()
+    if max_val - min_val == 0:
+        return [new_min for _ in arr]
+    normalized = (arr - min_val) / (max_val - min_val) * (new_max - new_min) + new_min
+    return normalized.tolist()
 
 
-def log_transform(df: pd.DataFrame, column=None) -> pd.DataFrame:
-    if column:
-        df[column] = np.log1p(df[column])
-    else:
-        df = np.log1p(df)
-    return df
+def standardize(data):
+    """Standardize numeric list or DataFrame column (mean=0, std=1)."""
+    arr = np.array(data, dtype=float)
+    mean = arr.mean()
+    std = arr.std() if arr.std() != 0 else 1.0
+    standardized = (arr - mean) / std
+    return standardized.tolist()
 
 
-def encode_categorical(df: pd.DataFrame, column: str) -> pd.DataFrame:
-    encoded = pd.get_dummies(df[column], prefix=column)
-    df = df.drop(columns=[column])
-    df = pd.concat([df, encoded], axis=1)
-    return df
+def clip(data, min_value=0.0, max_value=1.0):
+    """Clip numeric list or DataFrame column between min_value and max_value."""
+    arr = np.array(data, dtype=float)
+    clipped = np.clip(arr, min_value, max_value)
+    return clipped.tolist()
 
 
-# ----------------------
-# Text Helpers
-# ----------------------
-def tokenize_text(text: str):
-    return text.lower().split()
+def convert_to_int(data):
+    """Convert list or DataFrame column to integers, ignoring non-convertible values."""
+    result = []
+    for x in data:
+        try:
+            result.append(int(x))
+        except (ValueError, TypeError):
+            continue
+    return result
 
 
-def remove_non_alnum_spaces(text: str):
-    return re.sub(r"[^0-9a-zA-Z\s]+", "", text)
+def log_transform(data):
+    """Apply natural log to positive numbers, ignore negatives."""
+    return [np.log(x) for x in data if x > 0]
 
 
-def remove_stopwords(text: str, stopwords: list):
+
+# -----------------------------
+# TEXT FUNCTIONS
+# -----------------------------
+def tokenize_text(text):
+    """Split text into lowercase words, remove punctuation."""
+    return re.findall(r"\b\w+\b", text.lower())
+
+
+def remove_non_alnum_spaces(text):
+    """Remove characters that are not alphanumeric or spaces."""
+    return re.sub(r"[^0-9a-zA-Z ]+", "", text)
+
+
+def remove_stopwords(text, stopwords):
+    """Remove given stopwords from text."""
     tokens = tokenize_text(text)
-    return [t for t in tokens if t not in stopwords]
+    filtered = [t for t in tokens if t not in stopwords]
+    return " ".join(filtered)
 
 
-# ----------------------
-# List Helpers
-# ----------------------
+# -----------------------------
+# STRUCTURE FUNCTIONS
+# -----------------------------
 def flatten_list(lst):
+    """Flatten nested list."""
     result = []
     for el in lst:
-        if isinstance(el, (list, tuple)):
+        if isinstance(el, list):
             result.extend(flatten_list(el))
         else:
             result.append(el)
@@ -105,7 +122,10 @@ def flatten_list(lst):
 
 
 def shuffle_list(lst, seed=None):
+    """Shuffle a list with optional seed."""
+    import random
+
     rng = random.Random(seed)
-    lst_copy = lst.copy()
-    rng.shuffle(lst_copy)
-    return lst_copy
+    shuffled = lst[:]
+    rng.shuffle(shuffled)
+    return shuffled
