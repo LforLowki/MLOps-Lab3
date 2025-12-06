@@ -1,104 +1,111 @@
 """
-Data preprocessing functions for Lab0.
+Simple preprocessing helpers required for the CLI tests.
+These are intentionally minimal — only what the tests expect.
 """
 
-import math
-import random
+import pandas as pd
+import numpy as np
 import re
+import random
 
 
-def remove_missing(values):
-    """Removes missing values (None, '', NaN) from the list."""
-    return [
-        v
-        for v in values
-        if v not in (None, "", float("nan"))
-        and not (isinstance(v, float) and math.isnan(v))
-    ]
+# ----------------------
+# DataFrame Helpers
+# ----------------------
+def remove_missing(df: pd.DataFrame) -> pd.DataFrame:
+    return df.dropna()
 
 
-def fill_missing(values, fill_value=0):
-    """Fills missing values with the given value."""
-    return [
-        fill_value if v in (None, "") or (isinstance(v, float) and math.isnan(v)) else v
-        for v in values
-    ]
+def fill_missing(df: pd.DataFrame, value=0) -> pd.DataFrame:
+    return df.fillna(value)
 
 
-def remove_duplicates(values):
-    """Removes duplicate values."""
-    return list(dict.fromkeys(values))
+def remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:
+    return df.drop_duplicates()
 
 
-def normalize(values, new_min=0.0, new_max=1.0):
-    """Normalizes numerical values using min-max scaling."""
-    if not values:
-        return []
-    old_min, old_max = min(values), max(values)
-    if old_min == old_max:
-        return [new_min for _ in values]
-    return [
-        ((v - old_min) / (old_max - old_min)) * (new_max - new_min) + new_min
-        for v in values
-    ]
+def normalize(df: pd.DataFrame, column=None, new_min=0.0, new_max=1.0) -> pd.DataFrame:
+    if column:
+        min_val = df[column].min()
+        max_val = df[column].max()
+        df[column] = (df[column] - min_val) / (max_val - min_val) * (new_max - new_min) + new_min
+    else:
+        df = (df - df.min()) / (df.max() - df.min()) * (new_max - new_min) + new_min
+    return df
 
 
-def standardize(values):
-    """Standardizes numerical values using z-score."""
-    if not values:
-        return []
-    mean = sum(values) / len(values)
-    std = math.sqrt(sum((v - mean) ** 2 for v in values) / len(values))
-    if std == 0:
-        return [0 for _ in values]
-    return [(v - mean) / std for v in values]
+def standardize(df: pd.DataFrame, column=None) -> pd.DataFrame:
+    if column:
+        mean = df[column].mean()
+        std = df[column].std() or 1.0
+        df[column] = (df[column] - mean) / std
+    else:
+        df = (df - df.mean()) / df.std().replace(0, 1.0)
+    return df
 
 
-def clip(values, min_value=0, max_value=1):
-    """Clips numerical values to a specified range."""
-    return [max(min(v, max_value), min_value) for v in values]
+def clip(df: pd.DataFrame, column=None, min_value=0.0, max_value=1.0) -> pd.DataFrame:
+    if column:
+        df[column] = df[column].clip(min_value, max_value)
+    else:
+        df = df.clip(min_value, max_value)
+    return df
 
 
-def convert_to_int(values):
-    """Converts string values to integers (non-numerical excluded)."""
+def convert_to_int(df: pd.DataFrame, column=None) -> pd.DataFrame:
+    if column:
+        df[column] = df[column].astype(int)
+    else:
+        df = df.astype(int)
+    return df
+
+
+def log_transform(df: pd.DataFrame, column=None) -> pd.DataFrame:
+    if column:
+        df[column] = np.log1p(df[column])
+    else:
+        df = np.log1p(df)
+    return df
+
+
+def encode_categorical(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    encoded = pd.get_dummies(df[column], prefix=column)
+    df = df.drop(columns=[column])
+    df = pd.concat([df, encoded], axis=1)
+    return df
+
+
+# ----------------------
+# Text Helpers
+# ----------------------
+def tokenize_text(text: str):
+    return text.lower().split()
+
+
+def remove_non_alnum_spaces(text: str):
+    return re.sub(r"[^0-9a-zA-Z\s]+", "", text)
+
+
+def remove_stopwords(text: str, stopwords: list):
+    tokens = tokenize_text(text)
+    return [t for t in tokens if t not in stopwords]
+
+
+# ----------------------
+# List Helpers
+# ----------------------
+def flatten_list(lst):
     result = []
-    for v in values:
-        try:
-            result.append(int(v))
-        except (ValueError, TypeError):
-            continue
+    for el in lst:
+        if isinstance(el, (list, tuple)):
+            result.extend(flatten_list(el))
+        else:
+            result.append(el)
     return result
 
 
-def log_transform(values):
-    """Applies logarithmic transformation to positive values."""
-    return [math.log(v) for v in values if isinstance(v, (int, float)) and v > 0]
-
-
-def tokenize_text(text):
-    """Tokenizes text into lowercase alphanumeric words."""
-    return re.findall(r"\b[a-z0-9]+\b", text.lower())
-
-
-def remove_non_alnum_spaces(text):
-    """Removes non-alphanumeric characters (except spaces)."""
-    return re.sub(r"[^a-zA-Z0-9\s]", "", text)
-
-
-def remove_stopwords(text, stopwords):
-    """Removes stopwords from text."""
-    words = tokenize_text(text)
-    return " ".join([w for w in words if w not in stopwords])
-
-
-def flatten_list(list_of_lists):
-    """Flattens a list of lists."""
-    return [item for sublist in list_of_lists for item in sublist]
-
-
-def shuffle_list(values, seed=None):
-    """Randomly shuffles a list with an optional seed."""
-    random.seed(seed)
-    result = values[:]
-    random.shuffle(result)
-    return result
+def shuffle_list(lst, seed=None):
+    rng = random.Random(seed)
+    lst_copy = lst.copy()
+    rng.shuffle(lst_copy)
+    return lst_copy
