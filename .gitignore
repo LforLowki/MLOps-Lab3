@@ -1,5 +1,5 @@
 # Ignore only models folder at the root
-/models/
+#/models/
 
 # Allow models folder inside lab1
 !lab1/models/
