@@ -36,12 +36,14 @@ target-version = ['py310']
 [tool.pylint]
 disable = ["C0114", "C0115", "C0116"]
 
+
 [tool.pytest.ini_options]
 addopts = "-v --cov=lab1"
 pythonpath = ["."]
 testpaths = ["tests"]
 
+[tool.setuptools]
+package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
 include = ["lab1*"]
-exclude = ["templates*", "models_in_image*"]
