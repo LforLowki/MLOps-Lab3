@@ -9,7 +9,7 @@ app = FastAPI()
 async def predict(
     file: UploadFile = File(...),
     width: int | None = Form(None),
-    height: int | None = Form(None)
+    height: int | None = Form(None),
 ):
     content = await file.read()
     original_width, original_height = get_image_size(content)

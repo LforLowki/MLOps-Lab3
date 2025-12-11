@@ -53,7 +53,7 @@ def resize(image_path, width, height, out):
     with p.open("rb") as f:
         data = f.read()
     # fixed indentation (4 spaces)
-    resized = resize_image(data, width, height)  
+    resized = resize_image(data, width, height)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_bytes(resized)
     click.echo(f"Saved resized image to: {out_path}")

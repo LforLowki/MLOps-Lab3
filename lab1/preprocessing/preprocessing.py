@@ -86,7 +86,6 @@ def log_transform(data):
     return [np.log(x) for x in data if x > 0]
 
 
-
 # -----------------------------
 # TEXT FUNCTIONS
 # -----------------------------

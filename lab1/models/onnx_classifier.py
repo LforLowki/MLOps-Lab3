@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import onnxruntime as ort
 
+
 class ONNXClassifier:
     def __init__(self, model_path: str, labels_path: str):
         self.model_path = Path(model_path)
@@ -22,7 +23,7 @@ class ONNXClassifier:
         self.session = ort.InferenceSession(
             str(self.model_path),
             sess_options=sess_options,
-            providers=["CPUExecutionProvider"]
+            providers=["CPUExecutionProvider"],
         )
         self.input_name = self.session.get_inputs()[0].name
 

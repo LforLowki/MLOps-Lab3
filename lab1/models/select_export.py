@@ -39,11 +39,15 @@ def select_best_model(registered_name="lab3_pet_model"):
             best_acc = val_acc
             best = v
 
-    print(f"Selected version {best.version} (run {best.run_id}) with val_acc={best_acc}")
+    print(
+        f"Selected version {best.version} (run {best.run_id}) with val_acc={best_acc}"
+    )
     return best
 
 
-def export_to_onnx(best_version, model_uri=None, output_path=OUTPUT_DIR / "best_model.onnx", opset=18):
+def export_to_onnx(
+    best_version, model_uri=None, output_path=OUTPUT_DIR / "best_model.onnx", opset=18
+):
     if model_uri is None:
         model_uri = f"runs:/{best_version.run_id}/model"
     # load the PyTorch model (mlflow.pytorch.load_model returns a torch.nn.Module)
@@ -53,17 +57,29 @@ def export_to_onnx(best_version, model_uri=None, output_path=OUTPUT_DIR / "best_
 
     # Create dummy input (batch 1)
     import torch
+
     dummy = torch.randn(1, 3, 224, 224, dtype=torch.float32)
 
-    torch.onnx.export(model, dummy, str(output_path), opset_version=opset, input_names=["input"], output_names=["output"])
+    torch.onnx.export(
+        model,
+        dummy,
+        str(output_path),
+        opset_version=opset,
+        input_names=["input"],
+        output_names=["output"],
+    )
     print(f"Exported ONNX to {output_path}")
     return output_path
 
 
-def download_labels(best_version, filename="labels.json", dest=OUTPUT_DIR / "labels.json"):
+def download_labels(
+    best_version, filename="labels.json", dest=OUTPUT_DIR / "labels.json"
+):
     client = MlflowClient(tracking_uri="file://" + str(Path("mlruns").resolve()))
     run_id = best_version.run_id
-    local_path = client.download_artifacts(run_id, "labels/labels.json", dst_path=str(OUTPUT_DIR))
+    local_path = client.download_artifacts(
+        run_id, "labels/labels.json", dst_path=str(OUTPUT_DIR)
+    )
     # above returns path to file inside OUTPUT_DIR (or a folder) - ensure we have it at dest
     if isinstance(local_path, list):
         lp = Path(local_path[0])

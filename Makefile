@@ -11,14 +11,13 @@ install:
 	$(PIP) install -e .
 
 lint:
-	$(PIP) install pylint || true
-	$(VENV)/bin/pylint lab1 || true
+	$(PY) -m pylint lab1 || true
 
 format:
-	$(VENV)/bin/black lab1 tests
+	$(PY) -m black lab1 tests
 
 test:
-	$(VENV)/bin/pytest -v --cov=lab1
+	$(PY) -m pytest
 
 refactor: format lint
 

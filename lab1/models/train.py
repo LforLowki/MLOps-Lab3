@@ -33,7 +33,6 @@ DEFAULT_DATA_DIR = "data/oxford_pets"  # script will download / prepare here
 DEFAULT_MLRUNS = "mlruns"
 
 
-
 def prepare_datasets(data_root, img_size=224):
     data_root = Path(data_root)
     data_root.mkdir(parents=True, exist_ok=True)
@@ -71,8 +70,6 @@ def prepare_datasets(data_root, img_size=224):
     return train_dir, val_dir, classes
 
 
-
-
 def make_dataloaders(train_dir, val_dir, img_size=224, batch_size=16, num_workers=2):
     tr_transform = transforms.Compose(
         [
@@ -92,8 +89,12 @@ def make_dataloaders(train_dir, val_dir, img_size=224, batch_size=16, num_worker
     train_ds = datasets.ImageFolder(root=str(train_dir), transform=tr_transform)
     val_ds = datasets.ImageFolder(root=str(val_dir), transform=val_transform)
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    val_loader = DataLoader(val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    train_loader = DataLoader(
+        train_ds, batch_size=batch_size, shuffle=True, num_workers=num_workers
+    )
+    val_loader = DataLoader(
+        val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+    )
     return train_loader, val_loader, train_ds.classes
 
 
@@ -147,16 +148,27 @@ def train_one_run(
     mlflow.set_experiment(experiment_name)
 
     train_dir, val_dir, _ = prepare_datasets(data_root, img_size=img_size)
-    train_loader, val_loader, classes = make_dataloaders(train_dir, val_dir, img_size=img_size, batch_size=batch_size)
+    train_loader, val_loader, classes = make_dataloaders(
+        train_dir, val_dir, img_size=img_size, batch_size=batch_size
+    )
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = build_model(num_classes=len(classes), model_name=model_name, pretrained=True).to(device)
+    model = build_model(
+        num_classes=len(classes), model_name=model_name, pretrained=True
+    ).to(device)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=lr)
 
     # params and meta
-    params = dict(model_name=model_name, epochs=epochs, lr=lr, batch_size=batch_size, seed=SEED, img_size=img_size)
+    params = dict(
+        model_name=model_name,
+        epochs=epochs,
+        lr=lr,
+        batch_size=batch_size,
+        seed=SEED,
+        img_size=img_size,
+    )
 
     with mlflow.start_run(run_name=run_name) as run:
         mlflow.log_params(params)
@@ -198,7 +210,11 @@ def train_one_run(
         mlflow.log_artifact(str(labels_path), artifact_path="labels")
 
         # log model and register it (same model name so versions increment)
-        mlflow.pytorch.log_model(pytorch_model=model.cpu(), artifact_path="model", registered_model_name="lab3_pet_model")
+        mlflow.pytorch.log_model(
+            pytorch_model=model.cpu(),
+            artifact_path="model",
+            registered_model_name="lab3_pet_model",
+        )
 
     print("Run complete, registered model (if registration enabled).")
 
@@ -225,4 +241,3 @@ if __name__ == "__main__":
         data_root=args.data_root,
         model_name=args.model_name,
     )
-
