@@ -36,6 +36,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Check disk usage before Docker build
+        run: df -h
+
       - name: Set up QEMU (for buildx)
         uses: docker/setup-qemu-action@v3
 
@@ -54,6 +57,9 @@ jobs:
           push: true
           tags: ${{ env.DOCKER_IMAGE }}
           file: ./Dockerfile
+
+      - name: Check disk usage after Docker build
+        run: df -h
 
       - name: Trigger Render Deploy
         run: |
