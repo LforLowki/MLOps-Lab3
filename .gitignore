@@ -1,3 +1,11 @@
+# Ignore only models folder at the root
+/models/
+
+# Allow models folder inside lab1
+!lab1/models/
+!lab1/models/**
+
+# Other ignores
 .venv/
 __pycache__/
 *.pyc
@@ -5,7 +13,5 @@ __pycache__/
 coverage/
 mlruns/
 data/
-models/
 plots/
 results/
-
