@@ -40,3 +40,8 @@ disable = ["C0114", "C0115", "C0116"]
 addopts = "-v --cov=lab1"
 pythonpath = ["."]
 testpaths = ["tests"]
+
+
+[tool.setuptools.packages.find]
+include = ["lab1*"]
+exclude = ["templates*", "models_in_image*"]
