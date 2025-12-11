@@ -43,7 +43,9 @@ pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.setuptools]
-package-dir = {"" = "."}
+package-dir = {"" = "lab1"}
 
 [tool.setuptools.packages.find]
+where = ["lab1"]
 include = ["lab1*"]
+
