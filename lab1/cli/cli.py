@@ -52,7 +52,8 @@ def resize(image_path, width, height, out):
     out_path = Path(out) if out else p.with_name(f"{p.stem}_{width}x{height}{p.suffix}")
     with p.open("rb") as f:
         data = f.read()
-    resized = resize_image(data, width, height)
+    # fixed indentation (4 spaces)
+    resized = resize_image(data, width, height)  
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_bytes(resized)
     click.echo(f"Saved resized image to: {out_path}")

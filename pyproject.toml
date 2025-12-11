@@ -22,7 +22,12 @@ dependencies = [
     "jinja2>=3.1.6",
     "httpx>=0.28.1",
     "python-multipart",
+    "torch",
+    "torchvision",
+    "numpy",
+    "onnxruntime"
 ]
+
 
 [tool.black]
 line-length = 88

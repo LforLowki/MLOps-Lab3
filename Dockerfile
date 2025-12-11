@@ -18,16 +18,13 @@ FROM base AS builder
 
 RUN pip install --no-cache-dir uv
 
-# Copy dependency files
 COPY pyproject.toml .
 COPY uv.lock* .
 
-# ⬅️ MUST copy the source code BEFORE install
 COPY lab1 ./lab1
 COPY templates ./templates
 COPY README.md .
 
-# Install project + dependencies
 RUN uv pip install --system --no-cache .
 
 # ---- Runtime ----
@@ -35,9 +32,14 @@ FROM base AS runtime
 
 COPY --from=builder /usr/local /usr/local
 
+COPY models ./models
+RUN ls -l /app/models
 COPY lab1 ./lab1
 COPY templates ./templates
 
-EXPOSE 8000
+# Copy ONNX model + labels to /app/models
 
-CMD ["uvicorn", "lab1.api.api:app", "--host", "0.0.0.0", "--port", "8000"]
+
+EXPOSE 8080
+
+CMD ["uvicorn", "lab1.api.api:app", "--host", "0.0.0.0", "--port", "8080"]

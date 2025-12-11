@@ -1,44 +1,39 @@
-import numpy as np
+from pathlib import Path
 from PIL import Image
+from lab1.models.onnx_classifier import ONNXClassifier
 import io
 
+#BASE_MODELS_DIR = Path("/app/models")
+BASE_MODELS_DIR = Path("/app/models") if Path("/app/models").exists() else Path(__file__).parent.parent.parent / "models"
+print(str(BASE_MODELS_DIR))
+MODEL_PATH = BASE_MODELS_DIR / "best_model.onnx"
+LABELS_PATH = BASE_MODELS_DIR / "labels.json"
 
-# Dummy classifier
-class ONNXClassifier:
-    def predict(self, image):
-        x = self.preprocess(image)
-        return "class_A"  # dummy
-
-
-    def preprocess(self, image):
-        # Convert bytes -> PIL.Image if needed
-        if isinstance(image, bytes):
-            image = Image.open(io.BytesIO(image))
-        image = image.convert("RGB").resize((224, 224))
-        return np.array(image).astype(np.float32) / 255.0
+classifier = ONNXClassifier(
+    model_path=str(MODEL_PATH),
+    labels_path=str(LABELS_PATH),
+)
 
 
-classifier = ONNXClassifier()
-
-
-def predict_class(image_bytes):
-    return classifier.predict(image_bytes)
-
-
-def resize_image(image_bytes, width, height):
-    if isinstance(image_bytes, bytes):
-        image = Image.open(io.BytesIO(image_bytes))
-    else:
-        image = image_bytes
-    resized = image.resize((width, height))
+def resize_image(pil_image: bytes | Image.Image, width: int = 224, height: int | None = None) -> bytes:
+    if isinstance(pil_image, bytes):
+        pil_image = Image.open(io.BytesIO(pil_image))
+    if height is None:
+        height = width
+    img = pil_image.resize((width, height))
     buf = io.BytesIO()
-    resized.save(buf, format="JPEG")
+    img.save(buf, format="JPEG")
     return buf.getvalue()
 
 
-def get_image_size(image_bytes):
-    if isinstance(image_bytes, bytes):
-        image = Image.open(io.BytesIO(image_bytes))
-    else:
-        image = image_bytes
-    return image.size
+
+def get_image_size(pil_image: bytes | Image.Image):
+    if isinstance(pil_image, bytes):
+        pil_image = Image.open(io.BytesIO(pil_image))
+    return pil_image.size  # (width, height)
+
+
+def predict_class(pil_image: bytes | Image.Image) -> str:
+    if isinstance(pil_image, bytes):
+        pil_image = Image.open(io.BytesIO(pil_image))
+    return classifier.predict(pil_image)
