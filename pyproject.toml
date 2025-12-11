@@ -25,7 +25,8 @@ dependencies = [
     "torch",
     "torchvision",
     "numpy",
-    "onnxruntime"
+    "onnxruntime",
+    "pandas"
 ]
 
 
