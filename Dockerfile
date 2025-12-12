@@ -1,7 +1,5 @@
-# Base image with Python 3.13
-#FROM python:3.13-slim AS base
+# Base image with Python 3.11 (PyTorch CPU compatible)
 FROM python:3.11-slim AS base
-
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -26,19 +24,13 @@ COPY uv.lock* .
 # Install all deps EXCEPT torch/torchvision
 RUN uv pip install --system --no-cache .
 
-# Install PyTorch CPU-compatible versions for Python 3.13
-RUN pip install --no-cache-dir torch==2.9.1 torchvision==0.20.1 \
+# Install PyTorch CPU-compatible versions for Python 3.11
+RUN pip install --no-cache-dir torch==2.9.1 torchvision==0.24.1 \
     -f https://download.pytorch.org/whl/cpu
 
 COPY lab1 ./lab1
 COPY templates ./templates
 COPY README.md .
-
-
-# Install all deps EXCEPT torch/torchvision (they're huge)
-RUN uv pip install --system --no-cache . \
-    && pip install --no-cache-dir torch==2.2.2+cpu torchvision==0.17.2+cpu \
-       -f https://download.pytorch.org/whl/cpu
 
 # ---- Runtime ----
 FROM base AS runtime
