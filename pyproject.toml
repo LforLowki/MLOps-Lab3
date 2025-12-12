@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "lab1"
 version = "0.1.0"
 description = "Continuous Integration using GitHub Actions - Lab 1"
-authors = [{ name = "Your Name" }]
+authors = [{ name = "Lucas" }]
 readme = "README.md"
 requires-python = ">=3.10"
 
@@ -22,12 +22,17 @@ dependencies = [
     "jinja2>=3.1.6",
     "httpx>=0.28.1",
     "python-multipart",
-    "torch",
-    "torchvision",
     "numpy",
     "onnxruntime",
     "pandas"
 ]
+
+[project.optional-dependencies]
+withtorch = [
+    "torch",
+    "torchvision"
+]
+notorch = []
 
 [tool.black]
 line-length = 88

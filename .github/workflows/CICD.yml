@@ -9,21 +9,29 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v3
 
-      - name: Install packages
-        run: make install
+    - name: Install packages (with torch)
+      run: make install-withtorch
 
-      - name: Format
-        run: make format
+    - name: Format
+      run: make format
 
-      - name: Lint
-        run: make lint
+    - name: Lint
+      run: make lint
 
-      - name: Run tests
-        run: make test
+    - name: Run tests
+      run: make test
+
+    - name: Train model
+      run: make run-train
+
+    - name: Uninstall torch to save space
+      run: |
+        pip uninstall -y torch torchvision
+
 
   deploy:
     runs-on: ubuntu-latest
