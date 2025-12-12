@@ -24,7 +24,8 @@ dependencies = [
     "python-multipart",
     "numpy",
     "onnxruntime",
-    "pandas"
+    "pandas",
+    "mlflow"
 ]
 
 [project.optional-dependencies]
