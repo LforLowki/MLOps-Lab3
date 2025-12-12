@@ -21,12 +21,8 @@ RUN pip install --no-cache-dir uv
 COPY pyproject.toml .
 COPY uv.lock* .
 
-# Install all deps EXCEPT torch/torchvision
-RUN uv pip install --system --no-cache .
-
-# Install PyTorch CPU-compatible versions for Python 3.11
-RUN pip install --no-cache-dir torch==2.9.1 torchvision==0.24.1 \
-    -f https://download.pytorch.org/whl/cpu
+# Install ONLY API dependencies (no torch!)
+RUN uv pip install --system --no-cache ".[notorch]"
 
 COPY lab1 ./lab1
 COPY templates ./templates
@@ -44,3 +40,4 @@ COPY templates ./templates
 EXPOSE 8080
 
 CMD ["uvicorn", "lab1.api.api:app", "--host", "0.0.0.0", "--port", "8080"]
+
