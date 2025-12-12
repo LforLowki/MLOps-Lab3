@@ -2,9 +2,9 @@ name: CICD
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -37,7 +37,6 @@ jobs:
     needs: build
     env:
       DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/lab3-api:latest
-
     steps:
       - name: Checkout repository (with submodules)
         uses: actions/checkout@v4
@@ -76,7 +75,6 @@ jobs:
   deploy-hf:
     runs-on: ubuntu-latest
     needs: deploy
-
     steps:
       - name: Checkout repository with all branches
         uses: actions/checkout@v4
@@ -86,8 +84,15 @@ jobs:
 
       - name: Switch to hf-space branch
         run: |
-          git fetch origin hf-space
+          git fetch origin hf-space || git checkout -b hf-space
           git checkout hf-space
+
+      - name: Copy trained model into hf-space branch
+        run: |
+          cp models/best_model.onnx best_model.onnx
+          cp models/labels.json labels.json
+          git add best_model.onnx labels.json
+          git commit -m "Update trained model" || echo "No changes to commit"
 
       - name: Add HuggingFace remote
         env:
