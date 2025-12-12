@@ -25,7 +25,8 @@ dependencies = [
     "numpy",
     "onnxruntime",
     "pandas",
-    "mlflow"
+    "mlflow",
+    "onnxscript"
 ]
 
 [project.optional-dependencies]
