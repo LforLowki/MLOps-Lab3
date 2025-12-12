@@ -22,6 +22,8 @@ dependencies = [
     "jinja2>=3.1.6",
     "httpx>=0.28.1",
     "python-multipart",
+    "torch",
+    "torchvision",
     "numpy",
     "onnxruntime",
     "pandas"
@@ -34,16 +36,11 @@ target-version = ['py310']
 [tool.pylint]
 disable = ["C0114", "C0115", "C0116"]
 
-
 [tool.pytest.ini_options]
 addopts = "-v --cov=lab1"
 pythonpath = ["."]
 testpaths = ["tests"]
 
-[tool.setuptools]
-package-dir = {"" = "lab1"}
-
 [tool.setuptools.packages.find]
-where = ["lab1"]
+where = ["."]
 include = ["lab1*"]
-
