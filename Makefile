@@ -31,6 +31,7 @@ refactor: format lint
 
 run-train:
 	$(PY) lab1/models/train.py --epochs 1 --batch-size 16 --lr 0.001
+	$(PY) lab1/models/select_export.py
 
 all: install-withtorch format lint test run-train
 
