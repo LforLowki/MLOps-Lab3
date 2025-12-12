@@ -25,7 +25,10 @@ COPY lab1 ./lab1
 COPY templates ./templates
 COPY README.md .
 
-RUN uv pip install --system --no-cache .
+# Install all deps EXCEPT torch/torchvision (they're huge)
+RUN uv pip install --system --no-cache . \
+    && pip install --no-cache-dir torch==2.2.2+cpu torchvision==0.17.2+cpu \
+       -f https://download.pytorch.org/whl/cpu
 
 # ---- Runtime ----
 FROM base AS runtime
@@ -33,12 +36,8 @@ FROM base AS runtime
 COPY --from=builder /usr/local /usr/local
 
 COPY models ./models
-RUN ls -l /app/models
 COPY lab1 ./lab1
 COPY templates ./templates
-
-# Copy ONNX model + labels to /app/models
-
 
 EXPOSE 8080
 
