@@ -1,5 +1,7 @@
 # Base image with Python 3.13
-FROM python:3.13-slim AS base
+#FROM python:3.13-slim AS base
+FROM python:3.11-slim AS base
+
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
