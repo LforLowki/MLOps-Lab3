@@ -84,7 +84,6 @@ jobs:
   
       - name: Switch to hf-space branch
         run: |
-          git fetch origin hf-space || git checkout --orphan hf-space
           git checkout hf-space
   
       - name: Add HuggingFace remote
@@ -92,7 +91,7 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_USERNAME: ${{ secrets.HF_USERNAME }}
         run: |
-          git remote add huggingface https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/mlops-lab3-gui.git
+          git remote add huggingface https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/MLOps-Lab3.git
   
-      - name: Push hf-space branch to HuggingFace
+      - name: Push hf-space to HuggingFace
         run: git push huggingface hf-space:main --force
