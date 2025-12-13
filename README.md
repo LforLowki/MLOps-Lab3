@@ -244,9 +244,4 @@ results/
 
 Developed as part of the **MLOps course – Lab 3**
 Author: **LforLowki**
-
-```
-```
-
-
 ---
