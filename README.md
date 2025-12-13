@@ -53,11 +53,11 @@ The system consists of:
 │   └── preprocessing/    # Image preprocessing utilities
 ├── models/               # Exported ONNX model & labels (runtime)
 ├── data/                 # Dataset (ignored by git)
-├── mlruns/               # MLflow tracking data (ignored by git)
 ├── templates/            # API HTML templates
 ├── tests/                # Unit tests
 ├── Dockerfile
 ├── pyproject.toml
+├── uv.lock
 ├── Makefile
 ├── README.md
 └── .github/workflows/    # CI/CD pipeline
