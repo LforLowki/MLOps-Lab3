@@ -25,7 +25,6 @@ COPY uv.lock* .
 RUN uv pip install --system --no-cache ".[notorch]"
 
 COPY lab1 ./lab1
-COPY templates ./templates
 COPY README.md .
 
 # ---- Runtime ----
@@ -35,7 +34,6 @@ COPY --from=builder /usr/local /usr/local
 
 COPY models ./models
 COPY lab1 ./lab1
-COPY templates ./templates
 
 EXPOSE 8080
 
