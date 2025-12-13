@@ -53,7 +53,6 @@ The system consists of:
 │   └── preprocessing/    # Image preprocessing utilities
 ├── models/               # Exported ONNX model & labels (runtime)
 ├── data/                 # Dataset (ignored by git)
-├── templates/            # API HTML templates
 ├── tests/                # Unit tests
 ├── Dockerfile
 ├── pyproject.toml
